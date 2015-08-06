@@ -15,12 +15,23 @@ exports.load = function(req, res, next, quizId) {
 
 // GET /quizes
 exports.index = function(req, res) {
+  if (req.query.buscar) {
+    
+    var textoBusqueda = (req.query.buscar||'').replace(' ','%');
+    textoBusqueda = '%' + textoBusqueda + '%';
+    models.Quiz.findAll({where: ["pregunta like ?", textoBusqueda]}).then(
+      function(quizes) {
+        res.render('quizes/index', { quizes: quizes});
+      }
+    ).catch(function(error) { next(error);})
+  } else {
   models.Quiz.findAll().then(
     function(quizes) {
       res.render('quizes/index', { quizes: quizes});
     }
   ).catch(function(error) { next(error);})
- };
+  }
+};
 
 // GET /quizes/:id
 exports.show = function(req, res) {
